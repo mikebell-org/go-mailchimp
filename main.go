@@ -30,8 +30,21 @@ type SubscriptionOptions struct {
 }
 
 type List struct {
-	APIKey APIKey
-	ListID ListID
+	APIKey APIKey // APIKey received from mailchimp
+	ListID ListID // ListID describing this list
+}
+
+// MailChimp has proven mildly flakey for us, so we retry on error
+func (l List) ListMultiSubscribe(emailAddress string, mergeVars map[string]string, options SubscriptionOptions) (err error) {
+	var i uint
+	for i = 0; i < 5; i++ {
+		err = l.ListSubscribe(emailAddress, mergeVars, options)
+		if err == nil {
+			return
+		}
+		time.Sleep((1 << i) * time.Second)
+	}
+	return err
 }
 
 func (l List) ListSubscribe(emailAddress string, mergeVars map[string]string, options SubscriptionOptions) (err error) {
@@ -54,7 +67,7 @@ func (l List) ListSubscribe(emailAddress string, mergeVars map[string]string, op
 	for k, v := range mergeVars {
 		stuff[fmt.Sprintf("merge_vars[%s]", k)] = []string{v}
 	}
-	url := fmt.Sprintf("https://us2.api.mailchimp.com/1.3/?%s", stuff.Encode()) //?method=listSubscribe&output=json"
+	url := fmt.Sprintf("https://us2.api.mailchimp.com/1.3/?%s", stuff.Encode())
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -78,18 +91,6 @@ func (l List) ListSubscribe(emailAddress string, mergeVars map[string]string, op
 		}
 	}
 	return fmt.Errorf("Subscribe returned error: %s", responseRaw)
-}
-
-func (l List) ListMultiSubscribe(emailAddress string, mergeVars map[string]string, options SubscriptionOptions) (err error) {
-	var i uint
-	for i = 0; i < 5; i++ {
-		err = l.ListSubscribe(emailAddress, mergeVars, options)
-		if err == nil {
-			return
-		}
-		time.Sleep((1 << i) * time.Second)
-	}
-	return err
 }
 
 func _bool_liststring(x bool) []string {
