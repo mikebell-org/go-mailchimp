@@ -23,7 +23,7 @@ const (
 
 type SubscriptionOptions struct {
 	EmailType            EmailType
-	SendDobuleOptInEmail bool
+	SendDoubleOptInEmail bool
 	UpdateExisting       bool
 	ReplaceInterests     bool
 	SendWelcome          bool
@@ -59,7 +59,7 @@ func (l List) ListSubscribe(emailAddress string, mergeVars map[string]string, op
 		"apikey":            _string_liststring(string(l.APIKey)),
 		"email_type":        _string_liststring(string(options.EmailType)),
 		"email_address":     _string_liststring(emailAddress),
-		"double_optin":      _bool_liststring(options.SendDobuleOptInEmail),
+		"double_optin":      _bool_liststring(options.SendDoubleOptInEmail),
 		"update_existing":   _bool_liststring(options.UpdateExisting),
 		"replace_interests": _bool_liststring(options.ReplaceInterests),
 		"send_welcome":      _bool_liststring(options.SendWelcome),
