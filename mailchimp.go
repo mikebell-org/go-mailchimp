@@ -1,11 +1,11 @@
 package mailchimp
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 	"net/http"
 	"net/http/httputil"
-	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -14,20 +14,19 @@ type EmailType string
 type ListID string
 
 type List struct {
-	AuthKey APIKey 		// APIKey received from mailchimp
-	ListID ListID 		// ListID describing this list
-	UseBasicAuth bool	// True if we should use BasicAuth
+	AuthKey      APIKey // APIKey received from mailchimp
+	ListID       ListID // ListID describing this list
+	UseBasicAuth bool   // True if we should use BasicAuth
 }
 
 type ListsMembersPostInput struct {
-	Email 			string						`json:"email_address"`
-	EmailType		string						`json:"email_type"`
-	Status			string						`json:"status"`
+	Email       string            `json:"email_address"`
+	EmailType   string            `json:"email_type"`
+	Status      string            `json:"status"`
 	MergeFields map[string]string `json:"merge_fields"`
 }
 
 const MAILCHIMP_API_ENDPOINT = "https://us2.api.mailchimp.com/3.0"
-
 
 // MailChimp has proven mildly flakey for us, so we retry on error
 func (l List) ListMultiSubscribe(emailAddress string, useHTMLMails bool, mergeVars map[string]string) (err error) {
