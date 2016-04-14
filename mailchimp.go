@@ -14,6 +14,7 @@ type EmailType string
 type ListID string
 
 type List struct {
+	Datacenter   string // MailChimp datacenter. Maybe we can resolve it from AuthKey
 	AuthKey      APIKey // APIKey received from mailchimp
 	ListID       ListID // ListID describing this list
 	UseBasicAuth bool   // True if we should use BasicAuth
@@ -26,7 +27,7 @@ type ListsMembersPostInput struct {
 	MergeFields map[string]string `json:"merge_fields"`
 }
 
-const MAILCHIMP_API_ENDPOINT = "https://us2.api.mailchimp.com/3.0"
+const MAILCHIMP_API_ENDPOINT = "https://%s.api.mailchimp.com/3.0"
 
 // MailChimp has proven mildly flakey for us, so we retry on error
 func (l List) ListMultiSubscribe(emailAddress string, useHTMLMails bool, mergeVars map[string]string) (err error) {
@@ -43,7 +44,8 @@ func (l List) ListMultiSubscribe(emailAddress string, useHTMLMails bool, mergeVa
 
 func (l List) ListSubscribe(emailAddress string, useHTMLMails bool, mergeVars map[string]string) (err error) {
 	// Resolve Endpoint
-	endpointURL := fmt.Sprintf("%s/lists/%s/members", MAILCHIMP_API_ENDPOINT, l.ListID)
+	apiURL := fmt.Sprintf(MAILCHIMP_API_ENDPOINT, l.Datacenter)
+	endpointURL := fmt.Sprintf("%s/lists/%s/members", apiURL, l.ListID)
 
 	// Format data
 	var data = ListsMembersPostInput{}
