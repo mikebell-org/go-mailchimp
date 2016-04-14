@@ -77,11 +77,11 @@ func (l List) ListSubscribe(emailAddress string, useHTMLMails bool, mergeVars ma
 		return fmt.Errorf("Error sending request: %s", err)
 	}
 	// Check for errors
-	rawResp, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return fmt.Errorf("Error collecting debug response: %s", err)
-	}
 	if resp.StatusCode != 200 {
+		rawResp, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			return fmt.Errorf("Error collecting debug response: %s", err)
+		}
 		return fmt.Errorf("Non-200 response - %s", rawResp)
 	}
 	return
